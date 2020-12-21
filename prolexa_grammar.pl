@@ -33,6 +33,8 @@ pred(sparrow, 1,[n/sparrow]).
 pred(fly,     1,[v/fly]).
 pred(metal,   1,[n/metal]).
 pred(nail,    1,[n/nail]).
+pred(insulator, 1,[n/insulator]).
+pred(iron,    1,[n/iron]).
 pred(electricity,  1,[n/electricity]).
 pred(conduct, 1,[tv/conduct]).
 
@@ -51,7 +53,6 @@ noun_s2p(Noun_s,Noun_p):-
 	( Noun_s=woman -> Noun_p=women
 	; Noun_s=man -> Noun_p=men
 	; Noun_s=electricity -> Noun_p=electricity
-	%% ; Noun_s=metal -> Noun_p=metal
 	; atom_concat(Noun_s,s,Noun_p)
 	).
 
@@ -76,7 +77,6 @@ sentence1([(L:-true)]) --> noun(N,X),verb_phrase(N,X=>L).
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(p,M) --> [are],property(p,M).
 verb_phrase(N,M) --> iverb(N,M).
-%% verb_phrase(N,M1) --> iverb(N,M1),noun(N,M2).
 verb_phrase(N,M) --> tverb(N,M1=>M),noun(N,M1).
 
 property(N,M) --> adjective(N,M).
