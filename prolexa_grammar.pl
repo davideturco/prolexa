@@ -75,27 +75,24 @@ sentence1(C) --> determiner(N,M1,M2,C),noun(N,M1),verb_phrase(N,M2).
 sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
 sentence1([(L:-true)]) --> noun(N,X),verb_phrase(N,X=>L).
 sentence1(C) --> conditional_property(N,M1,M2,C),verb_phrase(N,M1),conditional_verb(N,M1,M2,C),verb_phrase(N,M2).
-%% sentence1([(L:-true)]) --> conditional(N,Y=>L),verb_phrase(N,X=>L).
 
 
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(p,M) --> [are],property(p,M).
 verb_phrase(N,M) --> iverb(N,M).
 verb_phrase(N,M) --> tverb(N,M1=>M),noun(N,M1).
-%% verb_phrase(s,L) --> conditional(s,X1=>L),[is],property(s,X1).
 
 property(N,M) --> adjective(N,M).
 property(s,M) --> [a],noun(s,M).
 property(p,M) --> noun(p,M).
 property(s,M) --> [made,of],noun(s,M).
 property(p,M) --> [made,of],noun(s,M).
-%% property(s,M) --> []
 
+% condtional parts of sentences, helping to achieve "if B then H"
 conditional_property(s,X=>B,X=>H,[(H:-B)]) --> [if,something].
 conditional_property(p,X=>B,X=>H,[(H:-B)]) --> [if,things].
 conditional_verb(s,X=>B,X=>H,[(H:-B)]) --> [then,it].
 conditional_verb(p,X=>B,X=>H,[(H:-B)]) --> [then,they].
-%% conditional(s,X=>B,X=>H,[(H:-B)]) --> [if,something,is],property(s,B),[then,it],property(s,H).
 
 determiner(s,X=>B,X=>H,[(H:-B)]) --> [every].
 determiner(p,X=>B,X=>H,[(H:-B)]) --> [all].
