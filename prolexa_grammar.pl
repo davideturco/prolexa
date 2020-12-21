@@ -31,7 +31,7 @@ pred(bird,    1,[n/bird]).
 pred(penguin, 1,[n/penguin]).
 pred(sparrow, 1,[n/sparrow]).
 pred(fly,     1,[v/fly]).
-pred(metal,   1,[n/metal]).
+pred(metal,   1,[n/metal,a/metal]).
 pred(nail,    1,[n/nail]).
 pred(insulator, 1,[n/insulator]).
 pred(iron,    1,[n/iron]).
@@ -73,17 +73,26 @@ sword --> [that].
 sentence1(C) --> determiner(N,M1,M2,C),noun(N,M1),verb_phrase(N,M2).
 sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
 sentence1([(L:-true)]) --> noun(N,X),verb_phrase(N,X=>L).
+sentence1(C) --> conditional_noun(N,M1,M2,C),property(N,M1),conditional_verb(N,M1,M2,C),verb_phrase(N,M2).
+%% sentence1([(L:-true)]) --> conditional(N,Y=>L),verb_phrase(N,X=>L).
+
 
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(p,M) --> [are],property(p,M).
 verb_phrase(N,M) --> iverb(N,M).
 verb_phrase(N,M) --> tverb(N,M1=>M),noun(N,M1).
+%% verb_phrase(s,L) --> conditional(s,X1=>L),[is],property(s,X1).
 
 property(N,M) --> adjective(N,M).
 property(s,M) --> [a],noun(s,M).
 property(p,M) --> noun(p,M).
 property(s,M) --> [made,of],noun(s,M).
 property(p,M) --> [made,of],noun(s,M).
+%% property(s,M) --> []
+
+conditional_noun(s,X=>B,X=>H,[(H:-B)]) --> [if,something,is].
+conditional_verb(s,X=>B,X=>H,[(H:-B)]) --> [then,it].
+%% conditional(s,X=>B,X=>H,[(H:-B)]) --> [if,something,is],property(s,B),[then,it],property(s,H).
 
 determiner(s,X=>B,X=>H,[(H:-B)]) --> [every].
 determiner(p,X=>B,X=>H,[(H:-B)]) --> [all].
