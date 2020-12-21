@@ -35,6 +35,7 @@ pred(metal,   1,[n/metal,a/metal]).
 pred(nail,    1,[n/nail]).
 pred(insulator, 1,[n/insulator]).
 pred(iron,    1,[n/iron]).
+pred(plastic, 1,[n/plastic,a/plastic]).
 pred(electricity,  1,[n/electricity]).
 pred(conduct, 1,[tv/conduct]).
 
@@ -73,7 +74,7 @@ sword --> [that].
 sentence1(C) --> determiner(N,M1,M2,C),noun(N,M1),verb_phrase(N,M2).
 sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
 sentence1([(L:-true)]) --> noun(N,X),verb_phrase(N,X=>L).
-sentence1(C) --> conditional_noun(N,M1,M2,C),property(N,M1),conditional_verb(N,M1,M2,C),verb_phrase(N,M2).
+sentence1(C) --> conditional_property(N,M1,M2,C),verb_phrase(N,M1),conditional_verb(N,M1,M2,C),verb_phrase(N,M2).
 %% sentence1([(L:-true)]) --> conditional(N,Y=>L),verb_phrase(N,X=>L).
 
 
@@ -90,8 +91,10 @@ property(s,M) --> [made,of],noun(s,M).
 property(p,M) --> [made,of],noun(s,M).
 %% property(s,M) --> []
 
-conditional_noun(s,X=>B,X=>H,[(H:-B)]) --> [if,something,is].
+conditional_property(s,X=>B,X=>H,[(H:-B)]) --> [if,something].
+conditional_property(p,X=>B,X=>H,[(H:-B)]) --> [if,things].
 conditional_verb(s,X=>B,X=>H,[(H:-B)]) --> [then,it].
+conditional_verb(p,X=>B,X=>H,[(H:-B)]) --> [then,they].
 %% conditional(s,X=>B,X=>H,[(H:-B)]) --> [if,something,is],property(s,B),[then,it],property(s,H).
 
 determiner(s,X=>B,X=>H,[(H:-B)]) --> [every].
