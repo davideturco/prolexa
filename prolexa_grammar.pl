@@ -51,6 +51,7 @@ noun_s2p(Noun_s,Noun_p):-
 	( Noun_s=woman -> Noun_p=women
 	; Noun_s=man -> Noun_p=men
 	; Noun_s=electricity -> Noun_p=electricity
+	%% ; Noun_s=metal -> Noun_p=metal
 	; atom_concat(Noun_s,s,Noun_p)
 	).
 
@@ -81,6 +82,8 @@ verb_phrase(N,M) --> tverb(N,M1=>M),noun(N,M1).
 property(N,M) --> adjective(N,M).
 property(s,M) --> [a],noun(s,M).
 property(p,M) --> noun(p,M).
+property(s,M) --> [made,of],noun(s,M).
+property(p,M) --> [made,of],noun(s,M).
 
 determiner(s,X=>B,X=>H,[(H:-B)]) --> [every].
 determiner(p,X=>B,X=>H,[(H:-B)]) --> [all].
