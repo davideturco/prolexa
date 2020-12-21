@@ -15,8 +15,8 @@ noun(p,M)			--> [Noun_p], {pred2gr(_P,1,n/Noun,M),noun_s2p(Noun,Noun_p)}.
 iverb(s,M)			--> [Verb_s], {pred2gr(_P,1,v/Verb,M),verb_p2s(Verb,Verb_s)}.
 iverb(p,M)			--> [Verb],   {pred2gr(_P,1,v/Verb,M)}.
 % transitive verb definition
-tverb(s,L)	--> [Verb_s], {pred2grtrans(_P,1,v/Verb,L),verb_p2s(Verb,Verb_s)}.
-tverb(p,L)	--> [Verb],   {pred2grtrans(_P,1,v/Verb,L)}.
+tverb(s,M)			--> [Verb_s], {pred2grtrans(_P,1,v/Verb,M),verb_p2s(Verb,Verb_s)}.
+tverb(p,M)			--> [Verb],   {pred2grtrans(_P,1,v/Verb,M)}.
 
 % unary predicates for adjectives, nouns and verbs
 pred(human,   1,[a/human,n/human]).
