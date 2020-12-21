@@ -14,6 +14,9 @@ noun(s,M)			--> [Noun],   {pred2gr(_P,1,n/Noun,M)}.
 noun(p,M)			--> [Noun_p], {pred2gr(_P,1,n/Noun,M),noun_s2p(Noun,Noun_p)}.
 iverb(s,M)			--> [Verb_s], {pred2gr(_P,1,v/Verb,M),verb_p2s(Verb,Verb_s)}.
 iverb(p,M)			--> [Verb],   {pred2gr(_P,1,v/Verb,M)}.
+% transitive verb definition
+tverb(s,L)	--> [Verb_s], {pred2grtrans(_P,1,v/Verb,L),verb_p2s(Verb,Verb_s)}.
+tverb(p,L)	--> [Verb],   {pred2grtrans(_P,1,v/Verb,L)}.
 
 % unary predicates for adjectives, nouns and verbs
 pred(human,   1,[a/human,n/human]).
@@ -36,6 +39,12 @@ pred2gr(P,1,C/W,X=>Lit):-
 	pred(P,1,L),
 	member(C/W,L),
 	Lit=..[P,X].
+
+% pred2gr for transitive verbs ("conduct electricity")
+pred2grtrans(P,1,C/W,Y=>X=>Lit):-
+	pred(P,1,L),
+	member(C/W,L),
+	Lit=..[P,X,Y].
 
 noun_s2p(Noun_s,Noun_p):-
 	( Noun_s=woman -> Noun_p=women
@@ -65,7 +74,8 @@ sentence1([(L:-true)]) --> noun(N,X),verb_phrase(N,X=>L).
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(p,M) --> [are],property(p,M).
 verb_phrase(N,M) --> iverb(N,M).
-verb_phrase(N,M1) --> iverb(N,M1),noun(N,M2).
+%% verb_phrase(N,M1) --> iverb(N,M1),noun(N,M2).
+verb_phrase(N,M) --> tverb(N,M1=>M),noun(N,M1).
 
 property(N,M) --> adjective(N,M).
 property(s,M) --> [a],noun(s,M).
