@@ -39,6 +39,8 @@ pred(plastic, 1,[n/plastic,a/plastic]).
 pred(electricity,  1,[n/electricity]).
 pred(conduct, 1,[tv/conduct]).
 
+
+
 pred2gr(P,1,C/W,X=>Lit):-
 	pred(P,1,L),
 	member(C/W,L),
@@ -76,11 +78,15 @@ sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
 sentence1([(L:-true)]) --> noun(N,X),verb_phrase(N,X=>L).
 sentence1(C) --> conditional_if(N,M1,M2,C),verb_phrase(N,M1),conditional_then(N,M1,M2,C),verb_phrase(N,M2).
 
-
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(p,M) --> [are],property(p,M).
 verb_phrase(N,M) --> iverb(N,M).
 verb_phrase(N,M) --> tverb(N,M1=>M),noun(N,M1).
+verb_phrase(N,M) --> neg_verb_phrase(N,M).
+
+ %negation (still problems with singleton)
+neg_verb_phrase(s,_X=>not(M)) --> [does, not], tverb(N,M1=>M),noun(N,M1).
+neg_verb_phrase(p,_X=>not(M)) --> [do, not], tverb(N,M1=>M),noun(N,M1).
 
 property(N,M) --> adjective(N,M).
 property(s,M) --> [a],noun(s,M).
@@ -93,6 +99,7 @@ conditional_if(s,X=>B,X=>H,[(H:-B)]) --> [if,something].
 conditional_if(p,X=>B,X=>H,[(H:-B)]) --> [if,things].
 conditional_then(s,X=>B,X=>H,[(H:-B)]) --> [then,it].
 conditional_then(p,X=>B,X=>H,[(H:-B)]) --> [then,they].
+
 
 determiner(s,X=>B,X=>H,[(H:-B)]) --> [every].
 determiner(p,X=>B,X=>H,[(H:-B)]) --> [all].
@@ -113,6 +120,8 @@ qword --> [].
 
 question1(Q) --> [who],verb_phrase(s,_X=>Q).
 question1(Q) --> [is], proper_noun(N,X),property(N,X=>Q).
+question1(Q) --> [is], noun(s,X),property(s,X=>Q).
+question1(Q) --> [are], noun(p,X),property(p,X=>Q).
 question1(Q) --> [does],proper_noun(_,X),verb_phrase(_,X=>Q).
 question1(Q) --> [do],noun(_,X),verb_phrase(_,X=>Q).
 %question1((Q1,Q2)) --> [are,some],noun(p,sk=>Q1),
