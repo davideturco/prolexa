@@ -15,8 +15,14 @@ noun(p,M)			--> [Noun_p], {pred2gr(_P,1,n/Noun,M),noun_s2p(Noun,Noun_p)}.
 iverb(s,M)			--> [Verb_s], {pred2gr(_P,1,v/Verb,M),verb_p2s(Verb,Verb_s)}.
 iverb(p,M)			--> [Verb],   {pred2gr(_P,1,v/Verb,M)}.
 % transitive verb definition
-tverb(s,M)			--> [Verb_s], {pred2grtrans(_P,1,tv/Verb,M),verb_p2s(Verb,Verb_s)}.
-tverb(p,M)			--> [Verb],   {pred2grtrans(_P,1,tv/Verb,M)}.
+tverb(s,M)			--> [Verb_s], {pred2gr_trans(_P,1,tv/Verb,M),verb_p2s(Verb,Verb_s)}.
+tverb(p,M)			--> [Verb],   {pred2gr_trans(_P,1,tv/Verb,M)}.
+%negated verb definition
+nverb(s,M)			--> [Verb_s], {pred2gr_neg(_P,1,v/Verb_s,M)}.
+nverb(p,M)			--> [Verb],   {pred2gr_neg(_P,1,v/Verb,M)}.
+% negated transitive verb definition
+ntverb(s,M)			--> [Verb_s], {pred2gr_trans_neg(_P,1,tv/Verb_s,M)}.
+ntverb(p,M)			--> [Verb],   {pred2gr_trans_neg(_P,1,tv/Verb,M)}.
 
 % unary predicates for adjectives, nouns and verbs
 pred(human,   1,[a/human,n/human]).
@@ -46,8 +52,19 @@ pred2gr(P,1,C/W,X=>Lit):-
 	member(C/W,L),
 	Lit=..[P,X].
 
+pred2gr_neg(P,1,C/W,X=>not(Lit)):-
+	pred(P,1,L),
+	member(C/W,L),
+	Lit=..[P,X].
+
+% pred2gr for negated transitive verbs
+pred2gr_trans_neg(P,1,C/W,Y=>X=>not(Lit)):-
+	pred(P,1,L),
+	member(C/W,L),
+	Lit=..[P,X,Y].
+
 % pred2gr for transitive verbs ("conduct electricity")
-pred2grtrans(P,1,C/W,Y=>X=>Lit):-
+pred2gr_trans(P,1,C/W,Y=>X=>Lit):-
 	pred(P,1,L),
 	member(C/W,L),
 	Lit=..[P,X,Y].
@@ -83,13 +100,17 @@ verb_phrase(p,M) --> [are],property(p,M).
 verb_phrase(N,M) --> iverb(N,M).
 verb_phrase(N,M) --> tverb(N,M1=>M),noun(N,M1).
 verb_phrase(N,M) --> neg_verb_phrase(N,M).
+verb_phrase(N,M) --> neg_trans_verb_phrase(N,M).
 
- %negation (still problems with singleton)
-neg_verb_phrase(s,_X=>not(M)) --> [does, not], tverb(N,M1=>M),noun(N,M1).
-neg_verb_phrase(p,_X=>not(M)) --> [do, not], tverb(N,M1=>M),noun(N,M1).
+ %negation
+neg_trans_verb_phrase(s,M) --> [does, not], ntverb(N,M1=>M),noun(N,M1).
+neg_trans_verb_phrase(p,M) --> [do, not], ntverb(N,M1=>M),noun(N,M1).
+neg_verb_phrase(s,M) --> [does, not], nverb(N,M1=>M),noun(N,M1).
+neg_verb_phrase(p,M) --> [do, not], nverb(N,M1=>M),noun(N,M1).
 
 property(N,M) --> adjective(N,M).
 property(s,M) --> [a],noun(s,M).
+property(s,M) --> [an],noun(s,M).
 property(p,M) --> noun(p,M).
 property(s,M) --> [made,of],noun(s,M).
 property(p,M) --> [made,of],noun(s,M).
