@@ -9,14 +9,14 @@ utterance(C) --> command(C).
 
 %%% lexicon, driven by predicates %%%
 
-adjective(_,M)		--> [Adj],    {pred2gr(_P,1,a/Adj, M)}.
+adjective(_,M)			--> [Adj],    {pred2gr(_P,1,a/Adj, M)}.
 % negated adjective definition
-neg_adjective(_,M)	--> [Adj],    {pred2gr_neg(_P,1,a/Adj, M)}.
+neg_adjective(_,M)		--> [Adj],    {pred2gr_neg(_P,1,a/Adj, M)}.
 noun(s,M)			--> [Noun],   {pred2gr(_P,1,n/Noun,M)}.
 noun(p,M)			--> [Noun_p], {pred2gr(_P,1,n/Noun,M),noun_s2p(Noun,Noun_p)}.
 % negated noun definition
-neg_noun(s,M)		--> [Noun],   {pred2gr_neg(_P,1,n/Noun,M)}.
-neg_noun(p,M)		--> [Noun_p], {pred2gr_neg(_P,1,n/Noun,M),noun_s2p(Noun,Noun_p)}.
+neg_noun(s,M)			--> [Noun],   {pred2gr_neg(_P,1,n/Noun,M)}.
+neg_noun(p,M)			--> [Noun_p], {pred2gr_neg(_P,1,n/Noun,M),noun_s2p(Noun,Noun_p)}.
 iverb(s,M)			--> [Verb_s], {pred2gr(_P,1,v/Verb,M),verb_p2s(Verb,Verb_s)}.
 iverb(p,M)			--> [Verb],   {pred2gr(_P,1,v/Verb,M)}.
 % transitive verb definition
