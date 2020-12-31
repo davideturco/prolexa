@@ -171,10 +171,10 @@ property(N,M) --> adjective(N,M).
 property(s,M) --> [a],noun(s,M).
 property(s,M) --> [an],noun(s,M).
 property(p,M) --> noun(p,M).
-%% property(s,M) --> [made,of],noun(s,M).
-%% property(p,M) --> [made,of],noun(s,M).
+%% property(s,M) --> [made,of],noun(_N,M).
+%% property(p,M) --> [made,of],noun(_N,M).
 % this differentiates "X is made of Y" and "X is Y". Use this or the above depending on whether you want them differentiated.
-property(s,X=>madeof(X,M)) --> [made,of],noun(s,M).
+property(s,X=>madeof(X,M)) --> [made,of],noun(_N,M).
 property(p,X=>madeof(X,M)) --> [made,of],noun(_N,M).
 
 % negated properties for use in conditional statements
@@ -183,8 +183,12 @@ neg_property(N,M) --> [not],neg_adjective(N,M).
 neg_property(s,M) --> [a],neg_noun(s,M).
 neg_property(s,M) --> [an],neg_noun(s,M).
 neg_property(p,M) --> neg_noun(p,M).
-neg_property(s,M) --> [made,of],neg_noun(s,M).
-neg_property(p,M) --> [made,of],neg_noun(s,M).
+%% neg_property(s,M) --> [made,of],neg_noun(_N,M).
+%% neg_property(p,M) --> [made,of],neg_noun(_N,M).
+% same as above for "made of"
+neg_property(s,X=>madeof(X,M)) --> [made,of],neg_noun(_N,M).
+neg_property(p,X=>madeof(X,M)) --> [made,of],neg_noun(_N,M).
+
 
 
 % transferred properties
