@@ -50,6 +50,13 @@ pred(plastic, 1,[n/plastic,a/plastic]).
 pred(electricity,  1,[n/electricity]).
 pred(conduct, 1,[tv/conduct]).
 
+%harry potter
+pred(muggle,   1,[n/muggle,a/muggle]).
+pred(person,  1,[n/person]).
+pred(magic,  1,[a/magic,n/magic]).
+pred(vanish,  1,[v/vanish]).
+pred(do,     1,[tv/do]).
+
 %ostrich
 pred(ostrich,    1,[n/ostrich]).
 pred(wounded,  1,[a/wounded]).
@@ -99,11 +106,14 @@ noun_s2p(Noun_s,Noun_p):-
 	; Noun_s=man -> Noun_p=men
 	; Noun_s=electricity -> Noun_p=electricity
 	; Noun_s=ostrich -> Noun_p=ostriches
+	; Noun_s=magic -> Noun_p=magic
 	; atom_concat(Noun_s,s,Noun_p)
 	).
 
 verb_p2s(Verb_p,Verb_s):-
 	( Verb_p=fly -> Verb_s=flies
+	; Verb_p=vanish -> Verb_s=vanishes
+    ; Verb_p=do     -> Verb_s=do
 	; 	atom_concat(Verb_p,s,Verb_s)
 	).
 
@@ -137,6 +147,8 @@ verb_phrase(N,M) --> tverb(N,M1=>M),noun(N,M1).
 verb_phrase(N,M) --> tverb(N,M1=>M),proper_noun(N,M1).
 verb_phrase(N,M) --> neg_verb_phrase(N,M).
 verb_phrase(N,M) --> neg_trans_verb_phrase(N,M).
+verb_phrase(N,M) --> modal_phrase(N,M).
+verb_phrase(N,M) --> neg_modal_phrase(N,M).
 % for ambiguous pluralisations with properties
 verb_phrase(_N1,M) --> [are],property(_N2,M).
 
@@ -148,13 +160,22 @@ neg_verb_phrase(p,M) --> [do, not], nverb(p,M).
 neg_verb_phrase(s,M) --> [is, not], neg_property(s,M).
 neg_verb_phrase(p,M) --> [are, not], neg_property(p,M).
 
+modal_phrase(_N, X=>can(X, M)) --> [can], tverb(p,M1=>M),noun(p,M1).
+modal_phrase(_N, X=>can(X, M)) --> [can], iverb(p, M).
+
+neg_modal_phrase(_N, X=>not(can(X, M))) --> [cannot], tverb(p,M1=>M), noun(p, M1).
+neg_modal_phrase(_N, X=>not(can(X, M))) --> [cannot], iverb(p, M).
+
 
 property(N,M) --> adjective(N,M).
 property(s,M) --> [a],noun(s,M).
 property(s,M) --> [an],noun(s,M).
 property(p,M) --> noun(p,M).
-property(s,M) --> [made,of],noun(s,M).
-property(p,M) --> [made,of],noun(s,M).
+%% property(s,M) --> [made,of],noun(s,M).
+%% property(p,M) --> [made,of],noun(s,M).
+% this differentiates "X is made of Y" and "X is Y". Use this or the above depending on whether you want them differentiated.
+property(s,X=>madeof(X,M)) --> [made,of],noun(s,M).
+property(p,X=>madeof(X,M)) --> [made,of],noun(_N,M).
 
 % negated properties for use in conditional statements
 neg_property(N,M) --> neg_adjective(N,M).
@@ -186,6 +207,8 @@ determiner(p,X=>B,X=>H,[(H:-B)]) --> [all].
 
 proper_noun(s,tweety) --> [tweety].
 proper_noun(s,peter)  --> [peter].
+proper_noun(s,harry)  --> [harry].
+proper_noun(s,mr_dursley) --> [mr, dursley].
 proper_noun(s,gary)   --> [gary].
 proper_noun(s,bill)   --> [bill].
 proper_noun(s,colin)  --> [colin].
@@ -209,9 +232,14 @@ question1(Q) --> [are], noun(p,X),property(p,X=>Q).
 question1(Q) --> [is], noun(s,X),neg_property(s,X=>Q).
 question1(Q) --> [are], noun(p,X),neg_property(p,X=>Q).
 question1(Q) --> [does],proper_noun(_,X),verb_phrase(_,X=>Q).
+question1(Q) --> [does],noun(_,X),verb_phrase(_,X=>Q).
 question1(Q) --> [do],noun(_,X),verb_phrase(_,X=>Q).
 %question1((Q1,Q2)) --> [are,some],noun(p,sk=>Q1),
 %					  property(p,sk=>Q2).
+question1(can(X, M)) --> [can],proper_noun(_,X),tverb(N,M1=>M),noun(N,M1).
+question1(can(X, M)) --> [can],proper_noun(_,X), iverb(p, M).
+question1(can(X, M)) --> [can],noun(_,X),tverb(N,M1=>M),noun(N,M1).
+question1(can(X, M)) --> [can],noun(_,X), iverb(p, M).
 
 
 %%% commands %%%
