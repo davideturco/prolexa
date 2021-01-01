@@ -67,15 +67,14 @@ pred(blue,  1,[a/blue]).
 pred(round, 1,[a/round]).
 pred(cold,  1,[a/cold]).
 pred(quiet, 1,[a/quiet]).
-
 pred(squirrel, 1,[n/squirrel]).
-pred(young, 1,[a/young]).
-pred(tiger, 1,[n/tiger]).
-pred(rough, 1,[a/rough]).
 pred(bear, 1,[n/bear]).
+pred(tiger, 1,[n/tiger]).
+pred(young, 1,[a/young]).
+pred(rough, 1,[a/rough]).
+pred(red, 1,[a/red]).
 pred(eat, 1,[tv/eat]).
 pred(like, 1,[tv/like]).
-pred(red, 1,[a/red]).
 
 
 pred2gr(P,1,C/W,X=>Lit):-
@@ -129,6 +128,9 @@ sword --> [that].
 sentence1(C) --> determiner(N,M1,M2,C),noun(N,M1),verb_phrase(N,M2).
 sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
 sentence1([(L:-true)]) --> noun(N,X),verb_phrase(N,X=>L).
+% if anything is X and Y then P(R)
+sentence1([(L:-M1,M2)]) --> if,verb_phrase(s,X=>M1),[and],adjective(s,X=>M2),[then],proper_noun(N,P1),verb_phrase(N,P1=>L).
+%if M1(X) then M2(X) simple conditional
 sentence1(C) --> conditional_if(N,M1,M2,C),verb_phrase(N,M1),conditional_then(N,M1,M2,C),verb_phrase(_N1,M2).
 % conditional statements with two conditions, one for two verb phrases, one for a verb phrase and an adjective, one for a verb phrase and a negated property
 % singleton variables are for dealing with ambiguous pluralisations arising from "they" being used in the singular
@@ -144,7 +146,7 @@ verb_phrase(p,M) --> [are],property(p,M).
 verb_phrase(p,M) --> [things,are],property(p,M).
 verb_phrase(N,M) --> iverb(N,M).
 verb_phrase(N,M) --> tverb(N,M1=>M),noun(N,M1).
-verb_phrase(N,M) --> tverb(N,M1=>M),proper_noun(N,M1).
+verb_phrase(N,M) --> tverb(N,M1=>M),proper_noun(_N,M1).
 verb_phrase(N,M) --> neg_verb_phrase(N,M).
 verb_phrase(N,M) --> neg_trans_verb_phrase(N,M).
 verb_phrase(N,M) --> modal_phrase(N,M).
@@ -218,6 +220,9 @@ proper_noun(s,bill)   --> [bill].
 proper_noun(s,colin)  --> [colin].
 proper_noun(s,dave)   --> [dave].
 proper_noun(s,arthur) --> [arthur].
+proper_noun(s,thesquirrel) --> [the, squirrel].
+proper_noun(s,thebear) --> [the, bear].
+proper_noun(s,thetiger) --> [the,tiger].
 %% proper_noun(s,M) --> [the],noun(s,M).
 
 
