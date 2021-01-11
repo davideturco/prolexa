@@ -127,3 +127,14 @@ in the prolexa directory.
     git commit -am "My commit message"
     git push origin master
     ```
+
+# Rule-based reasoning (update 13/1/2020)
+Prolexa can now support some limited rule-based reasoning. In particular, it can deal with basic counterfactuals, negation and modal expressions. Prolexa can now solve the following logical puzzles by AllenAI's [RuleTaker](https://rule-reasoning.apps.allenai.org/):
+- Conductivity and Counterfactuals
+- Harry Potter 
+- The Birds Rulebase
+- Relations with negation
+The user is advised to start general clauses with a determiner, such as "every" or "all". For example, the first clause in the puzzle "Conductivity and Counterfactuals" is "Metals conduct electricity.", but the input should be:
+'''
+"Every metal conducts electricity".
+'''
