@@ -9,11 +9,26 @@ utterance(C) --> command(C).
 
 %%% lexicon, driven by predicates %%%
 
-adjective(_,M)		--> [Adj],    {pred2gr(_P,1,a/Adj, M)}.
+adjective(_,M)			--> [Adj],    {pred2gr(_P,1,a/Adj, M)}.
+% negated adjective definition
+neg_adjective(_,M)		--> [Adj],    {pred2gr_neg(_P,1,a/Adj, M)}.
 noun(s,M)			--> [Noun],   {pred2gr(_P,1,n/Noun,M)}.
 noun(p,M)			--> [Noun_p], {pred2gr(_P,1,n/Noun,M),noun_s2p(Noun,Noun_p)}.
+% negated noun definition
+neg_noun(s,M)			--> [Noun],   {pred2gr_neg(_P,1,n/Noun,M)}.
+neg_noun(p,M)			--> [Noun_p], {pred2gr_neg(_P,1,n/Noun,M),noun_s2p(Noun,Noun_p)}.
+% non-transitive verb definition
 iverb(s,M)			--> [Verb_s], {pred2gr(_P,1,v/Verb,M),verb_p2s(Verb,Verb_s)}.
 iverb(p,M)			--> [Verb],   {pred2gr(_P,1,v/Verb,M)}.
+% transitive verb definition
+tverb(s,M)			--> [Verb_s], {pred2gr_trans(_P,1,tv/Verb,M),verb_p2s(Verb,Verb_s)}.
+tverb(p,M)			--> [Verb],   {pred2gr_trans(_P,1,tv/Verb,M)}.
+% negated verb definition
+nverb(s,M)			--> [Verb_s], {pred2gr_neg(_P,1,v/Verb_s,M)}.
+nverb(p,M)			--> [Verb],   {pred2gr_neg(_P,1,v/Verb,M)}.
+% negated transitive verb definition
+ntverb(s,M)			--> [Verb_s], {pred2gr_trans_neg(_P,1,tv/Verb_s,M)}.
+ntverb(p,M)			--> [Verb],   {pred2gr_trans_neg(_P,1,tv/Verb,M)}.
 
 % unary predicates for adjectives, nouns and verbs
 pred(human,   1,[a/human,n/human]).
@@ -28,20 +43,77 @@ pred(bird,    1,[n/bird]).
 pred(penguin, 1,[n/penguin]).
 pred(sparrow, 1,[n/sparrow]).
 pred(fly,     1,[v/fly]).
+pred(metal,   1,[n/metal,a/metal]).
+pred(nail,    1,[n/nail]).
+pred(insulator, 1,[n/insulator]).
+pred(iron,    1,[n/iron]).
+pred(plastic, 1,[n/plastic,a/plastic]).
+pred(electricity,  1,[n/electricity]).
+pred(conduct, 1,[tv/conduct]).
+
+%harry potter
+pred(muggle,   1,[n/muggle,a/muggle]).
+pred(person,  1,[n/person]).
+pred(magic,  1,[a/magic,n/magic]).
+pred(vanish,  1,[v/vanish]).
+pred(do,     1,[tv/do]).
+
+%ostrich
+pred(ostrich,    1,[n/ostrich]).
+pred(wounded,  1,[a/wounded]).
+pred(abnormal,  1,[a/abnormal]).
+
+%last puzzle
+pred(blue,  1,[a/blue]).
+pred(round, 1,[a/round]).
+pred(cold,  1,[a/cold]).
+pred(quiet, 1,[a/quiet]).
+pred(squirrel, 1,[n/squirrel]).
+pred(bear, 1,[n/bear]).
+pred(tiger, 1,[n/tiger]).
+pred(young, 1,[a/young]).
+pred(rough, 1,[a/rough]).
+pred(red, 1,[a/red]).
+pred(eat, 1,[tv/eat]).
+pred(like, 1,[tv/like]).
+
 
 pred2gr(P,1,C/W,X=>Lit):-
 	pred(P,1,L),
 	member(C/W,L),
 	Lit=..[P,X].
 
+% pred2gr for negated verbs
+pred2gr_neg(P,1,C/W,X=>not(Lit)):-
+	pred(P,1,L),
+	member(C/W,L),
+	Lit=..[P,X].
+
+% pred2gr for negated transitive verbs
+pred2gr_trans_neg(P,1,C/W,Y=>X=>not(Lit)):-
+	pred(P,1,L),
+	member(C/W,L),
+	Lit=..[P,X,Y].
+
+% pred2gr for transitive verbs ("conduct electricity")
+pred2gr_trans(P,1,C/W,Y=>X=>Lit):-
+	pred(P,1,L),
+	member(C/W,L),
+	Lit=..[P,X,Y].
+
 noun_s2p(Noun_s,Noun_p):-
 	( Noun_s=woman -> Noun_p=women
 	; Noun_s=man -> Noun_p=men
+	; Noun_s=electricity -> Noun_p=electricity
+	; Noun_s=ostrich -> Noun_p=ostriches
+	; Noun_s=magic -> Noun_p=magic
 	; atom_concat(Noun_s,s,Noun_p)
 	).
 
 verb_p2s(Verb_p,Verb_s):-
 	( Verb_p=fly -> Verb_s=flies
+	; Verb_p=vanish -> Verb_s=vanishes
+	; Verb_p=do     -> Verb_s=do
 	; 	atom_concat(Verb_p,s,Verb_s)
 	).
 
@@ -56,14 +128,82 @@ sword --> [that].
 % most of this follows Simply Logical, Chapter 7
 sentence1(C) --> determiner(N,M1,M2,C),noun(N,M1),verb_phrase(N,M2).
 sentence1([(L:-true)]) --> proper_noun(N,X),verb_phrase(N,X=>L).
+sentence1([(L:-true)]) --> noun(N,X),verb_phrase(N,X=>L).
+% if anything is X and Y then P(R)
+sentence1([(L:-M1,M2)]) --> if,verb_phrase(s,X=>M1),[and],adjective(s,X=>M2),[then],proper_noun(N,P1),verb_phrase(N,P1=>L).
+%if M1(X) then M2(X) simple conditional
+sentence1(C) --> conditional_if(N,M1,M2,C),verb_phrase(N,M1),conditional_then(N,M1,M2,C),verb_phrase(_N1,M2).
+% conditional statements with two conditions, one for two verb phrases, one for a verb phrase and an adjective, one for a verb phrase and a negated property
+% singleton variables are for dealing with ambiguous pluralisations arising from "they" being used in the singular
+sentence1(C) --> conditional_if(N,M1,M2,M3,C),verb_phrase(N,M1),conditional_and(N,M1,M2,M3,C),verb_phrase(N,M2),conditional_then(N,M1,M2,M3,C),verb_phrase(_N1,M3).
+sentence1(C) --> conditional_if(N,M1,M2,M3,C),verb_phrase(N,M1),conditional_and(N,M1,M2,M3,C),adjective(N,M2),conditional_then(N,M1,M2,M3,C),verb_phrase(_N1,M3).
+sentence1(C) --> conditional_if(N,M1,M2,M3,C),verb_phrase(N,M1),conditional_and(N,M1,M2,M3,C),neg_property(N,M2),conditional_then(N,M1,M2,M3,C),verb_phrase(_N1,M3).
+% for dealing with "X things are Y"
+sentence1(C) --> adjective(N,M1),transfer(N,M1,M2,C),adjective(N,M2).
+
 
 verb_phrase(s,M) --> [is],property(s,M).
 verb_phrase(p,M) --> [are],property(p,M).
+verb_phrase(p,M) --> [things,are],property(p,M).
 verb_phrase(N,M) --> iverb(N,M).
+verb_phrase(N,M) --> tverb(N,M1=>M),noun(N,M1).
+verb_phrase(N,M) --> tverb(N,M1=>M),proper_noun(_N,M1).
+verb_phrase(N,M) --> neg_verb_phrase(N,M).
+verb_phrase(N,M) --> neg_trans_verb_phrase(N,M).
+verb_phrase(N,M) --> modal_phrase(N,M).
+verb_phrase(N,M) --> neg_modal_phrase(N,M).
+% for ambiguous pluralisations with properties
+verb_phrase(_N1,M) --> [are],property(_N2,M).
+
+% negation
+neg_trans_verb_phrase(s,M) --> [does, not], ntverb(N,M1=>M),noun(N,M1).
+neg_trans_verb_phrase(p,M) --> [do, not], ntverb(N,M1=>M),noun(N,M1).
+neg_verb_phrase(s,M) --> [does, not], nverb(s,M).
+neg_verb_phrase(p,M) --> [do, not], nverb(p,M).
+neg_verb_phrase(s,M) --> [is, not], neg_property(s,M).
+neg_verb_phrase(p,M) --> [are, not], neg_property(p,M).
+
+modal_phrase(_N, X=>can(X, M)) --> [can], tverb(p,M1=>M),noun(p,M1).
+modal_phrase(_N, X=>can(X, M)) --> [can], iverb(p, M).
+
+neg_modal_phrase(_N, X=>not(can(X, M))) --> [cannot], tverb(p,M1=>M), noun(p, M1).
+neg_modal_phrase(_N, X=>not(can(X, M))) --> [cannot], iverb(p, M).
+
 
 property(N,M) --> adjective(N,M).
 property(s,M) --> [a],noun(s,M).
+property(s,M) --> [an],noun(s,M).
 property(p,M) --> noun(p,M).
+%% property(s,M) --> [made,of],noun(_N,M).
+%% property(p,M) --> [made,of],noun(_N,M).
+% this differentiates "X is made of Y" and "X is Y". Use this or the above depending on whether you want them differentiated.
+property(s,X=>madeof(X,M)) --> [made,of],noun(_N,M).
+property(p,X=>madeof(X,M)) --> [made,of],noun(_N,M).
+
+% negated properties for use in conditional statements
+neg_property(N,M) --> neg_adjective(N,M).
+neg_property(N,M) --> [not],neg_adjective(N,M).
+neg_property(s,M) --> [a],neg_noun(s,M).
+neg_property(s,M) --> [an],neg_noun(s,M).
+neg_property(p,M) --> neg_noun(p,M).
+%% neg_property(s,M) --> [made,of],neg_noun(_N,M).
+%% neg_property(p,M) --> [made,of],neg_noun(_N,M).
+% same as above for "made of"
+neg_property(s,X=>madeof(X,M)) --> [made,of],neg_noun(_N,M).
+neg_property(p,X=>madeof(X,M)) --> [made,of],neg_noun(_N,M).
+
+% transferred properties
+transfer(p,X=>B,X=>H,[(H:-B)]) --> [things, are].
+
+% single conditional
+conditional_if(_N,X=>B,X=>H,[(H:-B)])   --> if.
+conditional_then(_N,X=>B,X=>H,[(H:-B)]) --> then.
+
+% double conditional
+conditional_if(_N,X=>B1,X=>B2,X=>H,[(H:-B1,B2)])   --> if.
+conditional_and(_N,X=>B1,X=>B2,X=>H,[(H:-B1,B2)])  --> [and].
+conditional_then(_N,X=>B1,X=>B2,X=>H,[(H:-B1,B2)]) --> then.
+
 
 determiner(s,X=>B,X=>H,[(H:-B)]) --> [every].
 determiner(p,X=>B,X=>H,[(H:-B)]) --> [all].
@@ -71,7 +211,18 @@ determiner(p,X=>B,X=>H,[(H:-B)]) --> [all].
 %determiner(p, sk=>H1, sk=>H2, [(H1:-true),(H2 :- true)]) -->[some].
 
 proper_noun(s,tweety) --> [tweety].
-proper_noun(s,peter) --> [peter].
+proper_noun(s,peter)  --> [peter].
+proper_noun(s,harry)  --> [harry].
+proper_noun(s,mr_dursley) --> [mr, dursley].
+proper_noun(s,gary)   --> [gary].
+proper_noun(s,bill)   --> [bill].
+proper_noun(s,colin)  --> [colin].
+proper_noun(s,dave)   --> [dave].
+proper_noun(s,arthur) --> [arthur].
+proper_noun(s,thesquirrel) --> [the, squirrel].
+proper_noun(s,thebear) --> [the, bear].
+proper_noun(s,thetiger) --> [the,tiger].
+%% proper_noun(s,M) --> [the],noun(s,M).
 
 
 %%% questions %%%
@@ -84,9 +235,19 @@ qword --> [].
 
 question1(Q) --> [who],verb_phrase(s,_X=>Q).
 question1(Q) --> [is], proper_noun(N,X),property(N,X=>Q).
+question1(Q) --> [is], noun(s,X),property(s,X=>Q).
+question1(Q) --> [are], noun(p,X),property(p,X=>Q).
+question1(Q) --> [is], noun(s,X),neg_property(s,X=>Q).
+question1(Q) --> [are], noun(p,X),neg_property(p,X=>Q).
 question1(Q) --> [does],proper_noun(_,X),verb_phrase(_,X=>Q).
+question1(Q) --> [does],noun(_,X),verb_phrase(_,X=>Q).
+question1(Q) --> [do],noun(_,X),verb_phrase(_,X=>Q).
 %question1((Q1,Q2)) --> [are,some],noun(p,sk=>Q1),
 %					  property(p,sk=>Q2).
+question1(can(X, M)) --> [can],proper_noun(_,X),tverb(N,M1=>M),noun(N,M1).
+question1(can(X, M)) --> [can],proper_noun(_,X), iverb(p, M).
+question1(can(X, M)) --> [can],noun(_,X),tverb(N,M1=>M),noun(N,M1).
+question1(can(X, M)) --> [can],noun(_,X), iverb(p, M).
 
 
 %%% commands %%%
@@ -145,6 +306,12 @@ all --> [everything].
 
 tellmeabout --> [tell,me,about].
 tellmeabout --> [tell,me],all,[about].
+
+if --> [if, something].
+if --> [if, someone].
+
+then --> [then, it].
+then --> [then, they].
 
 rr(A):-random_member(A,["no worries","the pleasure is entirely mine","any time, peter","happy to be of help"]).
 
