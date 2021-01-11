@@ -17,12 +17,13 @@ noun(p,M)			--> [Noun_p], {pred2gr(_P,1,n/Noun,M),noun_s2p(Noun,Noun_p)}.
 % negated noun definition
 neg_noun(s,M)			--> [Noun],   {pred2gr_neg(_P,1,n/Noun,M)}.
 neg_noun(p,M)			--> [Noun_p], {pred2gr_neg(_P,1,n/Noun,M),noun_s2p(Noun,Noun_p)}.
+% non-transitive verb definition
 iverb(s,M)			--> [Verb_s], {pred2gr(_P,1,v/Verb,M),verb_p2s(Verb,Verb_s)}.
 iverb(p,M)			--> [Verb],   {pred2gr(_P,1,v/Verb,M)}.
 % transitive verb definition
 tverb(s,M)			--> [Verb_s], {pred2gr_trans(_P,1,tv/Verb,M),verb_p2s(Verb,Verb_s)}.
 tverb(p,M)			--> [Verb],   {pred2gr_trans(_P,1,tv/Verb,M)}.
-%negated verb definition
+% negated verb definition
 nverb(s,M)			--> [Verb_s], {pred2gr_neg(_P,1,v/Verb_s,M)}.
 nverb(p,M)			--> [Verb],   {pred2gr_neg(_P,1,v/Verb,M)}.
 % negated transitive verb definition
@@ -112,7 +113,7 @@ noun_s2p(Noun_s,Noun_p):-
 verb_p2s(Verb_p,Verb_s):-
 	( Verb_p=fly -> Verb_s=flies
 	; Verb_p=vanish -> Verb_s=vanishes
-    ; Verb_p=do     -> Verb_s=do
+	; Verb_p=do     -> Verb_s=do
 	; 	atom_concat(Verb_p,s,Verb_s)
 	).
 
@@ -190,8 +191,6 @@ neg_property(p,M) --> neg_noun(p,M).
 % same as above for "made of"
 neg_property(s,X=>madeof(X,M)) --> [made,of],neg_noun(_N,M).
 neg_property(p,X=>madeof(X,M)) --> [made,of],neg_noun(_N,M).
-
-
 
 % transferred properties
 transfer(p,X=>B,X=>H,[(H:-B)]) --> [things, are].
