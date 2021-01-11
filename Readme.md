@@ -134,7 +134,8 @@ Prolexa can now support some limited rule-based reasoning. In particular, it can
 - Harry Potter 
 - The Birds Rulebase
 - Relations with negation
+
 The user is advised to start general clauses with a determiner, such as "every" or "all". For example, the first clause in the puzzle "Conductivity and Counterfactuals" is "Metals conduct electricity.", but the input should be:
-'''
-"Every metal conducts electricity".
-'''
+    ```
+    "Every metal conducts electricity".
+    ```
